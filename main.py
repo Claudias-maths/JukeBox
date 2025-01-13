@@ -1,17 +1,74 @@
-import random
-import os
-import pygame
-import time
-import copy
-import datetime
-import json
-import requests
-import numpy as np
-from mutagen.mp3 import MP3
-from mutagen.oggopus import OggOpus
-from matplotlib import pyplot as plt
-from bs4 import BeautifulSoup
-from tinytag import TinyTag
+imports_successful = True
+missing_packages = []
+
+
+try:
+    import random
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("random")
+try:
+    import os
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("os")
+try:
+    import pygame
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("pygame")
+try:
+    import time
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("time")
+try:
+    import copy
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("copy")
+try:
+    import datetime
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("datetime")
+try:
+    import json
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("json")
+try:
+    import requests
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("requests")
+try:
+    import numpy as np
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("numpy")
+try:
+    from mutagen.mp3 import MP3
+    from mutagen.oggopus import OggOpus
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("mutagen")
+try:
+    from matplotlib import pyplot as plt
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("matplotlib")
+try:
+    from bs4 import BeautifulSoup
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("bs4")
+try:
+    from tinytag import TinyTag
+except ModuleNotFoundError:
+    imports_successful = False
+    missing_packages.append("tinytag")
+
 #import audioplayer
 
 
@@ -24,10 +81,9 @@ def printLogo():
     print(" |\"U'XXX'U\"|")
     print(" |\"U'XXX'U\"|" + " "*15 + "Designed by Claudia >:3")
     print(" |\"U''X''U\"|")
-    print(" |\"'U'\"'U'\"|" + " "*15 + "Version 1.3.1")
+    print(" |\"'U'\"'U'\"|" + " "*15 + "Version 1.4.0")
     print(" |\"''UUU''\"|")
     print(" ```````````")
-    #print("Welcome to the Jukebox! Designed by Claudia >:3")
 
 
 class JukeBox:
@@ -79,6 +135,37 @@ class JukeBox:
         self.artistnames = []
         #self.playing = False
 
+
+        #checking .json file integrity
+        # if only one is empty, the other is copied over immediately. This should prevent
+        # the .json files from being deleted by quitting the program at an inoppurtune time
+        jsonNonempty = False
+        backupjsonNonempty = False
+        with open("Songs.json", "r") as f:
+            for x in f:
+                if x != "":
+                    jsonNonempty = True
+
+        with open("songsbackup.json", "r") as f:
+            for x in f:
+                if x != "":
+                    backupjsonNonempty = True
+
+        if jsonNonempty ^ backupjsonNonempty:
+            if jsonNonempty:
+                with open("Songs.json", "r") as f:
+                    out_dict = json.load(f)
+                with open("songsbackup.json", "w") as f:
+                    json_obj = json.dumps(out_dict, indent=4)
+                    f.write(json_obj)
+            else:
+                with open("songsbackup.json", "r") as f:
+                    out_dict = json.load(f)
+                with open("Songs.json", "w") as f:
+                    json_obj = json.dumps(out_dict, indent=4)
+                    f.write(json_obj)
+
+
         #updating the songs directory to not break anything if names get changed or songs get added/
         #removed, etc
         directory = os.fsencode(self.Directory)
@@ -105,6 +192,9 @@ class JukeBox:
                 out_dict = json.load(f)
         else:
             out_dict = {}
+        with open("songsbackup.json", "w") as f:
+            json_obj = json.dumps(out_dict, indent=4)
+            f.write(json_obj)
         song_count = 0
         for file in os.listdir(directory):
             song_bytes += os.stat(directory+file).st_size
@@ -634,8 +724,6 @@ class JukeBox:
                     self.printGeneralHelp()
                 else:
                     self.printSpecificHelp(usr_input.replace("help ", ""))
-            elif "version" in usr_input:
-                self.shittyInternalVersionControl()
             elif "bugs" in usr_input:
                 self.updateBugs(usr_input.replace("bugs ", ""))
             elif "to-add" in usr_input:
@@ -726,6 +814,8 @@ class JukeBox:
                 plt.show()
             elif "dev.complete" in usr_input:
                 self.HowCompleteLibrary()
+            elif "dev.version" in usr_input:
+                self.shittyInternalVersionControl()
             elif "new-user" in usr_input:
                 print(self.users)
                 if usr_input.replace("new-user ", "").lower() in self.users:
@@ -1476,6 +1566,14 @@ class JukeBox:
                    "Song library now updates automatically."
                    "-search -not-latin now searches for any non-latin characters, not exclusively them"
                    "added ability to clear monthly listening stats. Created basic yearly analytics structure", "")
+        self.pront("1.4.0: Whole bunch of stuff that should have been in smaller updates. Added lyrics"
+                   "functionality, genres functionality, redesigned the architecture to use .json files instead"
+                   "of .txt ones. Finally set up github repo. Started to make this program easily installable."
+                   "(obv. not finished yet) Added settings.txt functionality, users and such are stored in that"
+                   "file and is editable upon install. (not after - that needs to be fixed). Added internal tools"
+                   "for checking completness of library and randomness of shuffle ability. fixed parser to be more"
+                   "like a bash style script. Added backup .json files to help shield against crashes and"
+                   "other such errors without destroying ones library.", "")
 
     def updateBugs(self, str):
         with open("bugs.txt","a") as f:
@@ -1751,7 +1849,7 @@ class JukeBox:
         with open("Songs.json", "r") as f:
             songsjson = json.load(f)
         for track_filepath in songsjson:
-            if songsjson[track_filepath]["genre"] is None:
+            if songsjson[track_filepath]["genre"] is None or songsjson[track_filepath]["genre"] == []:
                 try:
                     genre = TinyTag.get(self.Directory + track_filepath).genre
                     if genre != "null" and genre != "None":
@@ -1769,6 +1867,7 @@ class JukeBox:
         with open("Songs.json", "w") as f:
             json_obj = json.dumps(songsjson, indent=4)
             f.write(json_obj)
+        print("done!")
 
     def printLyrics(self, song):
         #print(song)
@@ -1784,20 +1883,28 @@ class JukeBox:
 
 
 if __name__ == "__main__":
-    buffer = " "*10
-    printLogo()
-    print()
-    with open("Output.txt", "w") as f:
-        f.write("done")
-    print("⇓⇓ Your input goes here!")
-    print(buffer+"      ⇓⇓ and what I say goes here! ⇓⇓")
-    print(buffer + "Hiya! Who are you?")
-    user = ""
-    while user == "":
-        with open("Input.txt", "r") as f:
-            for x in f:
-                if x != "":
-                    user = x
+    if imports_successful:
+        buffer = " "*10
+        printLogo()
+        print()
+        with open("Output.txt", "w") as f:
+            f.write("done")
+        print("⇓⇓ Your input goes here!")
+        print(buffer+"      ⇓⇓ and what I say goes here! ⇓⇓")
+        print(buffer + "Hiya! Who are you?")
+        user = ""
+        while user == "":
+            with open("Input.txt", "r") as f:
+                for x in f:
+                    if x != "":
+                        user = x
 
-    JukeBox(user, "Songs.txt").run()
+        JukeBox(user, "Songs.txt").run()
+    else:
+        print_flush = ""
+        for x in missing_packages:
+            print_flush += x + ", "
+        print(f"Missing Required Packages. Please install {print_flush}")
+        with open("Output.txt", "w") as f:
+            f.write("done. failed.")
 
