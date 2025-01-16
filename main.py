@@ -53,11 +53,11 @@ try:
 except ModuleNotFoundError:
     imports_successful = False
     missing_packages.append("mutagen")
-try:
+"""try:
     from matplotlib import pyplot as plt
 except ModuleNotFoundError:
     imports_successful = False
-    missing_packages.append("matplotlib")
+    missing_packages.append("matplotlib")"""
 try:
     from bs4 import BeautifulSoup
 except ModuleNotFoundError:
@@ -69,7 +69,79 @@ except ModuleNotFoundError:
     imports_successful = False
     missing_packages.append("tinytag")
 
-#import audioplayer
+# import audioplayer
+
+
+# checking to make sure all installed .txt and .json files exist
+# i.e. so the program does not crash randomly
+# then creating those files if they do not
+try:
+    with open("Analytics.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("Analytics.txt", "w") as f:
+        pass
+try:
+    with open("bugs.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("bugs.txt", "w") as f:
+        pass
+try:
+    with open("Input.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("Input.txt", "w") as f:
+        pass
+try:
+    with open("Output.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("Output.txt", "w") as f:
+        pass
+try:
+    with open("Playlists.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("Playlists.txt", "w") as f:
+        pass
+try:
+    with open("Settings.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("Settings.txt", "w") as f:
+        pass
+try:
+    with open("ShortTermAnalytics.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("ShortTermAnalytics.txt", "w") as f:
+        pass
+try:
+    with open("Songs.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("Songs.txt", "w") as f:
+        pass
+try:
+    with open("Songs.json", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("Songs.json.txt", "w") as f:
+        pass
+try:
+    with open("songlyrics.txt.txt", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("songlyrics.txt.txt", "w") as f:
+        pass
+try:
+    with open("songsbackup.json", "r") as f:
+        pass
+except FileNotFoundError:
+    with open("songsbackup.json", "w") as f:
+        pass
+
 
 
 def printLogo():
@@ -81,7 +153,7 @@ def printLogo():
     print(" |\"U'XXX'U\"|")
     print(" |\"U'XXX'U\"|" + " "*15 + "Designed by Claudia >:3")
     print(" |\"U''X''U\"|")
-    print(" |\"'U'\"'U'\"|" + " "*15 + "Version 1.4.0")
+    print(" |\"'U'\"'U'\"|" + " "*15 + "Version 1.4.1")
     print(" |\"''UUU''\"|")
     print(" ```````````")
 
@@ -257,10 +329,11 @@ class JukeBox:
         else:
             size_unit_songs = "Bytes"
         print(buffer + f"The size of the current library is {song_bytes} {size_unit_songs}!")
+        print(buffer + f"Please type 'help' or 'help COMMAND_NAME' for command information.")
 
 
     def printSong(self, song):
-        song = song.replace(".mp3", "").replace(".opus", "").replace(".wav", "")
+        song = song.replace(".mp3", "").replace(".opus", "").replace(".wav", "").replace("___", ":").replace("__","/")
         artist, name = song.split("-")[0], song.split("-")[1]
         if name[-1] == " ":
             name = name[0:-1]
@@ -437,16 +510,19 @@ class JukeBox:
                     print(buffer + "oops. can't find that one. Try again?")
                     fix = False
                 if main_one:
-                    try:
+                    print(song)
+                    if song[-1] == " ":
                         _song = song[-1]
-                    except UnboundLocalError:
-                        _song = ""
+                    else:
+                        _song = song
                     if _song[0] == " ":
                         _song = _song[1:]
                     if _song in self.songnames:
                         playlist += _song + "±"
                     else:
                         print(buffer + "Didn't recognise song :((")
+                    print(_song)
+                    print(song)
 
                 if fix:
                     #print(playlist)
@@ -488,7 +564,7 @@ class JukeBox:
                         queue_print_flush[0:10] + ["... and " + str(len(self.queue) - 10) + " more ..."], prev_print)
                 else:
                     prev_print = self.prontSquare(queue_print_flush, prev_print)
-            elif "play" in usr_input[0:4]:
+            elif "play" in usr_input[0:4] and "playlist" not in usr_input[0:8]:
                 if " " not in usr_input:
                     if not paused:
                         if not pygame.mixer.music.get_busy():
@@ -508,21 +584,21 @@ class JukeBox:
                         if usr_input.replace("play -p ", "") in self.playlistnames:
                             for x in self.playlistInhalts[self.playlistnames.index(usr_input.replace("-play -p ", ""))][0]:
                                 if x != "":
-                                    self.queue.append(self.songs[self.songnames.index(x)])
-                                    self.playedsongs.append(song)
+                                    self.queue.append(self.songs[x])
+                                    #self.playedsongs.append(song)
                         #prev_print = self.pront(self.queue, prev_print)
                 elif "-ps" in usr_input:
                     if usr_input.replace("play -ps", "").replace(" ", "") != "":
                         if usr_input.replace("play -ps ", "") in self.playlistnames:
                             for x in self.playlistInhalts[self.playlistnames.index(usr_input.replace("play -ps ", ""))][0]:
                                 if x != "":
-                                    self.queue.append(self.songs[self.songnames.index(x)])
+                                    self.queue.append(self.songs[x])
                                     self.playedsongs.append(x)
                             random.shuffle(self.queue)
                             #prev_print = self.pront(self.queue, prev_print)
                 elif "-s" in usr_input:
-                    if usr_input.replace("play -s ", "") in self.songnames:
-                        song = self.songs[self.songnames.index(usr_input.replace("play -s ", ""))]
+                    if usr_input.replace("play -s ", "") in self.songs:
+                        song = usr_input.replace("play -s ", "")
                         pygame.mixer.music.load(self.Directory + song)
                         pygame.mixer.music.play()
                         prev_print = self.pront(self.printSong(song), prev_print)
@@ -530,7 +606,7 @@ class JukeBox:
             elif "rewind" in usr_input[0:6]:
                 pygame.mixer.music.rewind()
             elif "songs" in usr_input[0:5]:
-                prev_print = self.prontSquare(self.songnames, prev_print)
+                prev_print = self.prontSquare(self.songs, prev_print)
             elif "loop" in usr_input[0:4]:
                 num = usr_input.replace("loop ", "")
                 if num[2] in ["0","1","2","3","4","5","6","7","8","9"] and num[1] != " ":
@@ -539,9 +615,9 @@ class JukeBox:
                     num = num[0:1]
                 else:
                     num = num[0]
-                if usr_input.replace("loop ", "").replace(num+" ", "") in self.songnames:
+                if usr_input.replace("loop ", "").replace(num+" ", "") in self.songs:
                     for i in range(0, int(num)):
-                        self.queue.insert(0, self.songs[self.songnames.index(usr_input.replace("loop ", "").replace(num+" ", ""))])
+                        self.queue.insert(0, usr_input.replace("loop ", "").replace(num+" ", ""))
             elif "back" in usr_input[0:4] or "prev" in usr_input[0:4]:
                 pygame.mixer.music.unload()
                 self.queue.insert(0, self.playedsongs[-1])
@@ -607,7 +683,7 @@ class JukeBox:
             elif "queue" in usr_input[0:5]:
                 if "-artist" in usr_input:
                     if usr_input.split("queue -artist ")[1]+" " in self.artistnames:
-                        for x in range(0,len(self.artistnames)):
+                        for x in range(0,len(self.songs)):
                             if self.artistnames[x] == usr_input.split("queue -artist ")[1]+" ":
                                 self.queue.append(self.songs[x])
                             random.shuffle(self.queue)
@@ -615,13 +691,13 @@ class JukeBox:
                 elif "-p" in usr_input and "-ps" not in usr_input:
                     if usr_input.split("-p ")[1] in self.playlistnames:
                         for x in self.playlistInhalts[self.playlistnames.index(usr_input.split("-p ")[1])][0]:
-                            if x in self.songnames:
-                                self.queue.append(self.songs[self.songnames.index(x)])
+                            if x in self.songs:
+                                self.queue.append(self.songs[x])
                 elif "-ps" in usr_input:
                     if usr_input.split("-ps ")[1] in self.playlistnames:
                         for x in self.playlistInhalts[self.playlistnames.index(usr_input.split("-ps ")[1])][0]:
-                            if x in self.songnames:
-                                self.queue.append(self.songs[self.songnames.index(x)])
+                            if x in self.songs:
+                                self.queue.append(self.songs[x])
                         random.shuffle(self.queue)
                         random.shuffle(self.queue)
                 elif "-a" in usr_input:
@@ -629,7 +705,7 @@ class JukeBox:
                         self.queue.append(x)
                     random.shuffle(self.queue)
                     random.shuffle(self.queue)
-                    queue_print_flush = [x.replace(".mp3", "").replace(".opus", "") for x in self.queue]
+                    queue_print_flush = [x for x in self.queue]
                     if len(queue_print_flush) > 10:
                         prev_print = self.prontSquare(
                             queue_print_flush[0:10] + ["... and " + str(len(self.queue) - 10) + " more ..."],
@@ -637,31 +713,31 @@ class JukeBox:
                     else:
                         prev_print = self.prontSquare(queue_print_flush, prev_print)
                 elif "-v" in usr_input:
-                    queue_print_flush = [x.replace(".mp3", "").replace(".opus", "") for x in self.queue]
+                    queue_print_flush = [x for x in self.queue]
                     if len(queue_print_flush) > 10:
                         prev_print = self.prontSquare(queue_print_flush[0:10]+["... and " + str(len(self.queue)-10) + " more ..."], prev_print)
                     else:
                         prev_print = self.prontSquare(queue_print_flush, prev_print)
                 elif "-va" in usr_input:
-                    queue_print_flush = [x.replace(".mp3", "").replace(".opus", "") for x in self.queue]
+                    queue_print_flush = [x for x in self.queue]
                     prev_print = self.prontSquare(queue_print_flush, prev_print)
                 elif "-f" in usr_input:
-                    if usr_input.replace("queue -f ", "") in self.songnames:
-                        self.queue.insert(0, self.songs[self.songnames.index(usr_input.replace("queue -f ", ""))])
+                    if usr_input.replace("queue -f ", "") in self.songs:
+                        self.queue.insert(0, usr_input.replace("queue -f ", ""))
                         print("Aye Aye!")
-                        queue_print_flush = [x.replace(".mp3", "").replace(".opus", "") for x in self.queue]
+                        queue_print_flush = [x for x in self.queue]
                         if len(queue_print_flush) > 10:
                             prev_print = self.prontSquare(queue_print_flush[0:10] + ["... and " + str(len(self.queue)-10) + " more ..."], prev_print)
                         else:
                             prev_print = self.prontSquare(queue_print_flush, prev_print)
                 elif "-i" in usr_input:
-                    if usr_input.replace("queue -i ", "").split(" ")[1:][0] in self.songnames:
+                    if usr_input.replace("queue -i ", "").split(" ")[1:][0] in self.songs:
                         position = usr_input.replace("queue -i ", "").split(" ")[0]
-                        _song = self.songs[self.songnames.index(usr_input.replace("queue -i "+str(position)+" ", ""))]
+                        _song = usr_input.replace("queue -i ", "").split(" ")[1:][0]
                         self.queue.insert(int(position)-1, _song)
                 else:
-                    if usr_input.replace("queue ", "") in self.songnames:
-                        self.queue.append(self.songs[self.songnames.index(usr_input.replace("queue ", ""))])
+                    if usr_input.replace("queue ", "") in self.songs:
+                        self.queue.append(usr_input.replace("queue ", ""))
             elif "empty" in usr_input[0:5]:
                 if usr_input.replace("empty", "").replace(" ", "") != "":
                     while len(self.queue) > int(usr_input.replace("empty", "").replace(" ", "")):
@@ -677,9 +753,10 @@ class JukeBox:
                             prev_print = self.pront(x, prev_print)
                 elif "-as" in usr_input and "-not-latin" not in usr_input:
                     term = usr_input.replace("search -as ", "")
+                    print(term)
                     for x in self.songs:
-                        if term in x[1]:
-                            prev_print = self.pront(self.printSong(x).replace(".mp3", "").replace(".opus", ""), prev_print)
+                        if term in x:
+                            prev_print = self.pront(x, prev_print)
                 elif "-a" in usr_input and "-not-latin" in usr_input:
                     chars = [chr(i) for i in range(97, 97 + 26 + 1)] + [chr(i) for i in range(65, 65 + 26)]
                     for x in self.artistnames:
@@ -716,24 +793,15 @@ class JukeBox:
                             prev_print = self.pront(x, prev_print)
                 else:
                     term = usr_input.replace("search ", "")
-                    for x in self.songnames:
+                    for x in self.songs:
                         if term in x:
                             prev_print = self.pront(x, prev_print)
-            elif "help" in usr_input:
+            elif "help" in usr_input[0:4]:
                 if usr_input.replace("help", "").replace(" ", "") == "":
                     self.printGeneralHelp()
                 else:
                     self.printSpecificHelp(usr_input.replace("help ", ""))
-            elif "bugs" in usr_input:
-                self.updateBugs(usr_input.replace("bugs ", ""))
-            elif "to-add" in usr_input:
-                if "-v" in usr_input:
-                    with open("To_Add.txt", "r") as f:
-                        for x in f:
-                            prev_print = self.pront(x, prev_print)
-                else:
-                    self.updateToAdd(usr_input.replace("to-add ", ""))
-            elif "monthly" in usr_input:
+            elif "monthly" in usr_input[0:7]:
                 if usr_input.replace("monthly", "").replace(" ","") == "":
                     self.MonthlyListeningStats(10, "de")
                 else:
@@ -759,14 +827,15 @@ class JukeBox:
                     else:
                         prev_print = self.pront("Sorry!! I don't know who you are :(( So I can't get rid of your listening data", prev_print)
             #anything labelled dev.____ is meant only for the developer, me!
-            #these do things like check randomness (qallanalytics), add to internal bug repots,
-            #check how complete the library stats are (will be generalised to users soon)
-            elif "dev.bugs" in usr_input:
+            #and i guess you too if you took the time to read through this code <3
+            #these do things like check randomness (qallanalytics), add to internal bug repots, etc
+            elif "dev.bugs" in usr_input[0:8]:
                 with open("bugs.txt", "r") as f:
                     for x in f:
                         prev_print = self.pront(x, prev_print)
-            elif "dev.qallanalytics" in usr_input:
-                pygame.mixer.music.stop()
+            elif "dev.qallanalytics" in usr_input[0:17]:
+                pass
+                """pygame.mixer.music.stop()
                 self.queue = []
                 self.artistnames = []
                 self.songnames = []
@@ -811,19 +880,28 @@ class JukeBox:
 
                 plt.scatter(xs,ys)
                 plt.plot(xs_m, ys_m, color="red")
-                plt.show()
-            elif "dev.complete" in usr_input:
-                self.HowCompleteLibrary()
-            elif "dev.version" in usr_input:
+                plt.show()"""
+            elif "dev.bugs" in usr_input[0:8]:
+                self.updateBugs(usr_input.replace("dev.bugs ", ""))
+            elif "dev.to-add" in usr_input[0:11]:
+                if "-v" in usr_input:
+                    with open("To_Add.txt", "r") as f:
+                        for x in f:
+                            prev_print = self.pront(x, prev_print)
+                else:
+                    self.updateToAdd(usr_input.replace("dev.to-add ", ""))
+            elif "dev.version" in usr_input[0:11]:
                 self.shittyInternalVersionControl()
-            elif "new-user" in usr_input:
+            elif "complete" in usr_input[0:8]:
+                self.HowCompleteLibrary()
+            elif "new-user" in usr_input[0:8]:
                 print(self.users)
                 if usr_input.replace("new-user ", "").lower() in self.users:
                     self.user = usr_input.replace("new-user ", "").lower()
                     prev_print = self.pront(f"Hello there, {self.user.lower()}!", prev_print)
                 else:
                     print(f"Sorry! I don't recognise you!!, User is still {self.user}")
-            elif "stats" in usr_input:
+            elif "stats" in usr_input[0:5]:
                 if "-clear" in usr_input:
                     if self.user != "guest":
                         current_stats = []
@@ -844,7 +922,7 @@ class JukeBox:
                             prev_print)
                 else:
                     self.AnalyseItAll()
-            elif "update-lyrics" in usr_input:
+            elif "update-lyrics" in usr_input[0:13]:
                 if "-ua" in usr_input:
                     self.Lyrics(is_spoof_agents=True)
                 elif "-n" in usr_input:
@@ -852,13 +930,17 @@ class JukeBox:
                 else:
                     self.Lyrics()
                 self.HowCompleteLibrary()
-            elif "text-to-lyrics" in usr_input:
+            elif "text-to-lyrics" in usr_input[0:14]:
                 l_track = usr_input.replace("text-to-lyrics ", "")
                 self.TxtToLyrics(l_track, "songlyrics.txt")
-            elif "genres" in usr_input:
+            elif "genres" in usr_input[0:6]:
                 self.find_genres()
-            elif "lyrics" in usr_input:
+            elif "lyrics" in usr_input[0:6]:
                 self.printLyrics(song)
+            elif "settings" in usr_input[0:8]:
+                self.updateSettings()
+            elif "done" in usr_input[0:4]:
+                prev_print = self.pront("Menu Exited!", prev_print)
             elif usr_input == "@@@":
                 pass
                 #this keeps the program from printing 'sorry bestie!...' consistently
@@ -891,17 +973,19 @@ class JukeBox:
                         if x != "" and x != "playlist -c":
                             name = x
             f = open("Playlists.txt", "a")
-            f.write("\n" + self.user + "±" + name + "±" )
+            f.write(self.user + "±" + name + "±" + "\n")
             f.close()
             self.playlistnames = []
             self.playlistInhalts = []
             with open("Playlists.txt", "r") as f:
                 for x in f:
-                    split_names = x.split("±")
-                    self.playlistInhalts.append([x.split("±")[2:]])
-                    self.playlistnames.append(x.split("±")[1])
+                    print("x: ", x)
+                    if x.replace(" ", "").replace("\n", "") != "":
+                        split_names = x.split("±")
+                        self.playlistInhalts.append([x.split("±")[2:]])
+                        self.playlistnames.append(x.split("±")[1])
         else:
-            print("Sorry bestie, I can't let you do that :((")
+            print("Sorry bestie, I can't let you do that :(( You're a guest, and I don't have that much memory space.")
 
     def update_playlist(self, name):
         f = open("Playlists.txt", "r")
@@ -944,7 +1028,7 @@ class JukeBox:
                     for x in f:
                         if x != "":
                             action = x
-            if action.lower().replace(" ","") == "-add":
+            if action.lower().replace(" ","") == "add":
                 #print(self.songnames)
                 print(buffer + "What song? >> ")
                 song = ""
@@ -955,9 +1039,9 @@ class JukeBox:
                         for x in f:
                             if x != "":
                                 song = x
-                if song in self.songnames:
+                if song in self.songs:
                     if song in playlist:
-                        print(buffer + "It's already here. Do you want to add it again? >> ")
+                        print(buffer + "It's already here. Type 'yes' or 'y' to add it again. >> ")
                         confirm = ""
                         with open("Input.txt", "w") as f:
                             f.write("")
@@ -972,13 +1056,13 @@ class JukeBox:
                         playlist += song + "±"
                 else:
                     print(buffer + "Sorry I can't find that song")
-            elif "-add" in action.lower():
-                song = action.replace("-add ","")
-                if song in self.songnames:
+            elif "add" in action.lower()[0:3]:
+                song = action.replace("add ","")
+                if song in self.songs:
                     playlist += song + "±"
                 else:
                     print(buffer + "Didn't recognise song :((")
-            elif action.lower().replace(" ","") == '-remove':
+            elif action.lower().replace(" ","") == 'remove':
                 print(buffer + "What song?")
                 song = ""
                 with open("Input.txt", "w") as f:
@@ -990,14 +1074,14 @@ class JukeBox:
                                 song = x
                 if song in playlist:
                     playlist = playlist.replace(song+"±", "")
-            elif "-remove" in action:
-                song = action.replace("-remove ", "")
+            elif "remove" in action[0:6].lower():
+                song = action.replace("remove ", "")
                 if song in playlist:
                     playlist = playlist.replace(song+"±", "")
                 else:
                     print(buffer+"no such song exists")
-            elif action.lower().replace(" ","") == "-reorder":
-                print(buffer + self.songnames)
+            elif action.lower().replace(" ","") == "reorder":
+                print(buffer + playlist)
                 print(buffer + "What is song one?")
                 with open("Input.txt", "w") as f:
                     f.write("")
@@ -1020,7 +1104,7 @@ class JukeBox:
                     playlist.replace("aaa123654hkjlasdjkhfieqwryp,namxvTEMPORARYPLACEHOLDER", song2)
                 else:
                     print(buffer + "Sorry! Didn't recognise one or both of the names!")
-            elif action.lower().replace(" ","") == "-search":
+            elif action.lower().replace(" ","") == "search":
                 print(buffer + "Search terms?")
                 terms = ""
                 with open("Input.txt", "w") as f:
@@ -1030,27 +1114,27 @@ class JukeBox:
                         for x in f:
                             if x != "":
                                 terms = x
-                #print("Pwong ", terms)
-                for x in self.songnames:
+                for x in self.songs:
                     if terms in x:
                         print(buffer + x)
                 print(buffer + "---")
-            elif "-search" in action:
-                #arch currently broken
+            elif "search" in action[0:6]:
                 if "-as" in action:
                     for x in self.songs:
-                        if action.replace("-search -as ", "") in x[1]:
-                            prev_print = self.pront(x[0].replace(".mp3", "").replace(".opus", ""), prev_print)
+                        if action.replace("search -as ", "") in x:
+                             self.pront(x, "")
 
                 else:
-                        for x in self.songnames:
-                            if action.replace("-search ", "") in x:
-                                print(buffer + x)
+                    search_term = action.replace("search ", "")
+                    for x in self.songs:
+                        if search_term in x:
+                            print(buffer + x)
                 print(buffer + "---")
-            elif action.lower().replace(" ","") == "-done" or action.lower().replace(" ","") == "-quit":
+            elif action.lower().replace(" ","") == "done" or action.lower().replace(" ","") == "quit":
                 main = False
             else:
-                print(buffer + "Sorry, I didn't quite get that.")
+                print(buffer + "Sorry, I don't understand that. I understand: 'add', 'remove', 'search', '"
+                               "reorder', 'done'. and 'quit'")
         if fix:
             print(buffer + playlist)
             f = open("Playlists.txt", "r")
@@ -1085,9 +1169,9 @@ class JukeBox:
         random.shuffle(playlist)
 
     def pront(self, thing, check):
-        terminal_length = 80
+        terminal_length = self.terminal_length
         if thing != check:
-            if len(thing)+len(buffer) <= 80:
+            if len(thing)+len(buffer) <=terminal_length:
                 print(buffer+thing)
             else:
                 thinglist = thing.split(" ")
@@ -1105,7 +1189,7 @@ class JukeBox:
             return check
 
     def prontSquare(self, things, check):
-        terminal_length = 80 #generalise this
+        terminal_length = self.terminal_length
         internal_buffer = 10
         print_flush = ""
         if things != check:
@@ -1127,7 +1211,7 @@ class JukeBox:
                             else:
                                 print(buffer + print_flush)
                                 print_flush = thingy
-                        if len(print_flush) + len(buffer) + internal_buffer <= 80:
+                        if len(print_flush) + len(buffer) + internal_buffer <= terminal_length:
                             print_flush += " "*internal_buffer
                         else:
                             print(buffer+print_flush)
@@ -1141,81 +1225,156 @@ class JukeBox:
     def printSpecificHelp(self, command):
         print(buffer + "STR and INT refer to a user-specified string or integer, respectively")
         format = 5
-        if "pause" in command or "-stop" in command:
-            print(buffer + "pause/stop", "Pauses internal music player. Does not unload current song.")
-        elif "rewind" in command:
-            print(buffer + "Rewinds internal music player. Does not unload current song or change queue.")
-        elif "playlist" in command:
-            print(buffer + "Command for working with playlists. Saves them to a text file as a string of local song paths.")
-            print(buffer + "-c", " "*format, "Creates new playlist. Will prompt for a name.")
-            print(buffer + "-e STR", " "*(format-4), "Edits the playlist specified after the argument (STR).")
-            print(buffer + "-r STR", " "*(format-4), "Removes the playlist specified playlist in the argument (STR).")
-            print(buffer + "-v", " "*format, "Displays all current playlists, without editing access.")
-        elif "play" in command and not "-playlist" in command:
-            print(buffer + "No args", " "*(format*2-len("No args")),
-                  "Plays or unpauses the music player. Loads it as necessary from the queue. If there are no songs in queue, prints that.")
-            print(buffer + "-p", " "*(format*2-len("-p")), "Plays a playlist (STR) by appending it to the queue.")
-            print(buffer + "-ps STR", " " * (format * 2 - len("-ps STR")),
-                  "Plays a playlist (STR) by appending it to the queue, and then shuffling the queue.")
-            print(buffer + "-s STR", " "*(format*2-len("-s STR")), "Plays a song (STR) without appending to the queue. Will not autoplay.")
-        elif "queue" in command:
-            print(buffer + "No args STR", " "*(format*2-len("No args STR")), "If followed by a song name (STR), queues that song.")
-            print(buffer + "-a", " "*(format*2-len("-a")),
-                  "Puts every song in the library in the queue, randomly, and prints queue")
-            print(buffer + "-f STR", " "*(format*2-len("-f STR")), "Puts the following song (STR) in the front of the queue.")
-            print(buffer + "-i INT", " "*(format*2-len("-i INT")), "Puts the following song at the place specified in the queue by the INT.")
-            print(buffer + "-p STR", " "*(format*2-len("-p STR")), "Queues the playlist (STR) specified.")
-            print(buffer + "-v", " "*(format*2-len("-v")), "Prints the current queue.")
-            print(buffer + "-va", " " * (format * 2 - len("-va")), "Prints ALL of the current queue.")
-            print(buffer + "-artist STR", " " * (format * 2 - len("-artist STR")), "Queues every song by STR in library and shuffles queue.")
-        elif "shuffle" in command:
-            print(buffer + "shuffle", "Shuffles current queue using random.shuffle().")
-        elif "songs" in command:
-            print(buffer + "songs", "prints the entirety of the songs library in the working directory.")
-        elif "loop" in command:
-            print(buffer + "loop INT", "queues the following song INT number of times.")
-        elif "back" in command or "-prev" in command:
-            print(buffer + "back/prev", "shunts current song to the front of the queue, and then plays the previous song.")
-        elif "next" in command or "-skip" in command:
-            print(buffer + "skip/next", "skips the current song, plays the next one from the queue.")
-        elif "quit" in command or "-kill" in command:
-            print(buffer + "quit/kill", "quits music player and parser.")
-        elif "empty" in command:
-            print(buffer + "No args", "Empties the queue.")
-            print(buffer + "INT", "Empties the queue from the front until there are INT songs remaining.")
-        elif "search" in command:
-            print(buffer + "No args STR", " "*format, "Searches through the song library for the specified string STR")
-            print(buffer + "-a STR", " "*(format+5), "Searches through the song library artists' for the string STR")
-            print(buffer + "-as STR", " " * (format + 4), "Searches through the song library artists' for STR, prints their songs too")
-            print(buffer + "-not-latin", " ", "Searches through the song library for any song containing a character not in the latin alphabet.")
-            print(buffer + "-not-english", "", "Searches through the song library for any song containing a character not easily found on a US keyboard layout")
-        elif "monthly" in command:
-            print(buffer + "No Args", " "*(format), "Returns recent listening stats, styled like a receipt, by time listened to each song.")
-            print(buffer + "-log", " "*(format+3), "Returns recent listening stats, styled like a receipt, by the log of the number of listens." )
-            print(buffer + "-clear", " "*(format+1), "Clears current user's recent listening stats. Fails if user is a guest.")
+        help_list = [["add"], ["STR STR_"], ["If playlist owner is the current user, then adds the song STR to the playlist STR_"],
+                     [["back", "prev"], [""],
+                      ["shunts current song to the front of the queue, and then plays the previous song."]],
+                     [["complete"], [""], ["Loops through the songs.json file, counting which songs have non-empty lyrics and genres."]],
+                     [["done"], [""], ["If in a menu (settings, playlists, etc), quits that menu."]],
+                     [["empty"], ["No args", "INT"],
+                      ["Empties the queue.", "Empties the queue from the front until there are INT songs remaining."]],
+                     [["genres"], [""], ["Updates the song genres in songs.json by reading the song metadata, for each song in the library."]],
+                     [["help"], ["no args", "STR"],
+                      ["Prints summary of commands.", "Prints specific description of command STR, including usage and arguments."]],
+                     [["kill", "quit"], [""], ["quits music player and parser."]],
+                     [["loop"], ["INT<10"], ["queues the following song INT number of times."]],
+                     [["lyrics"], [""], ["Prints lyrics of song currently in player. If no lyrics exist, prints nothing."]],
+                     [["monthly"], ["No args", "-log", "-clear"],
+                      ["Returns recent listening stats, styled like a receipt, by time listened to each song.",
+                       "Returns recent listening stats, styled like a receipt, by the log of the number of listens.",
+                       "Clears current user's recent listening stats. Fails if user is a guest."]],
+                     [["new-user"], ["STR"], ["If STR in the list of users, switches to that user, updating analytics essentially immediately"]],
+                     [["next", "skip"], [""], ["skips the current song, plays the next one from the queue."]],
+                     [["pause", "stop"], [""], ["Pauses internal music player. Does not unload current song."]],
+                     [["play"], ["No args", "-p STR", "-ps STR", "-s STR"],
+                      ["Plays or unpauses the music player. Loads it as necessary from the queue. If there are no songs in queue, prints that.",
+                       "Plays a playlist (STR) by appending it to the queue, and then shuffling the queue.",
+                       "Plays a song (STR) without appending to the queue. Will not autoplay."]],
+                     [["playlist"], ["", "-c", "-e STR", "-r STR", "-v"],
+                      ["Command for working with playlists. Saves them to a text file as a string of local song paths.",
+                       "Creates new playlist. Will prompt for a name.", "Edits the playlist specified after the argument (STR).",
+                       "Removes the playlist specified playlist in the argument (STR).", "Displays all current playlists, without editing access."]],
+                     [["qadd"], ["STR"], ["Adds the song currently in the player (playing or paused) to the playlist STR,"
+                                          "if the current user is the owner of that playlist."]],
+                     [["queue"], ["", "STR", "-a", "-f STR", "-i INT", "-p STR", "-v", "-va", "-artist STR"],
+                      ["Command for queueing songs. Requires args.",
+                       "If followed by a song (STR), queues that song.",
+                       "Puts every song in the library in the queue, randomly, and prints queue",
+                       "Puts the following song (STR) in the front of the queue.",
+                       "Puts the following song at the place specified in the queue by the INT.",
+                       "Queues the playlist (STR) specified.",
+                       "Prints first 10 songs of current queue.", "Prints ALL of current queue.",
+                       "Queues every song by STR in library and shuffles queue."
+                       ]],
+                     [["rewind"], [""], ["Rewinds internal music player. Does not unload current song or change queue."]],
+                     [["search"], ["STR", "-a STR", "-as STR", "-not-latin", "-not-english"],
+                      ["Searches through the song library for the specified string STR",
+                       "Searches through the song library artists' for the string STR",
+                       "Searches through the song library artists' for STR, prints their songs.",
+                       "Searches through the song library for any song containing a character not in the english alphabet + characters with fadas or umlauts.",
+                       "Searches through the song library for any song containing a character not easily found on a US keyboard layout"]],
+                     [["settings"], [""], ["Opens the settings menu. Allows user to update the settings file."]],
+                     [["shuffle"], [""], ["Shuffles current queue using random.shuffle()."]],
+                     [["songs"], [""], ["prints the entirety of the songs library in the working directory."]],
+                     [["stats"], ["No args", "-clear"],
+                      ["Returns long-term listening stats, including time listened to songs, number of listens to songs, most listened to artist, and most listened to genre",
+                       "Clears current user's long-term listening stats (stored in Analytics.txt). Fails if user is a guest."]],
+                     [["text-to-lyrics"], ["STR"], "Turns the contents of the songlyrics.txt file into song lyrics for the song STR, stored in Songs.json. Does some minor formatting to make it more readable"],
+                     [["update-lyrics"], ["no args", "-ua", "-n"],
+                      ["The only part of this code that requires an active internet connection. And a vpn is HIGHLY SUGGESTED"
+                       "for running this code. This scours various lyrics websites to find the lyrics for songs in the library, and saves those lyrics to"
+                       "songs.json.",
+                       "Runs the same code, but spoofs the user-agent of the client. Slightly more consistent in avoiding 403 errors.",
+                       "Runs the same code, but if a song's lyrics are stored as 'None :((', it attempts to update them."]]]
+        if self.terminal_length > len(buffer + format * " ") + 15:
+            print(command+".")
+            for i in range(0,len(help_list)):
+                for j in range(0,len(help_list[i][0])):
+                    if command==help_list[i][0][j]:
+                        print_flush = buffer + help_list[i][0][j] + format*" "
+                        for k in range(0,len(help_list[i][1])):
+                            print_flush += help_list[i][1][k] + " "
+                            if len(print_flush + help_list[i][2][k]) < self.terminal_length:
+                                print_flush += help_list[i][2][k]
+                                print(print_flush)
+                            else:
+                                split_help_list = help_list[i][2][k].split(" ")
+                                for l in range(0, len(split_help_list)):
+                                    if len(print_flush + split_help_list[l]) < self.terminal_length:
+                                        print_flush += split_help_list[l] + " "
+                                    else:
+                                        print(print_flush)
+                                        print_flush = buffer + format*" " + split_help_list[l] + " "
+                                print(print_flush)
+        else:
+            print("Terminal Size too small to make this look nice")
+            for i in range(0,len(help_list)):
+                for j in range(0,len(help_list[i][0])):
+                    if command==help_list[i][0][j]:
+                        print(buffer + help_list[i][0][j])
+                        for k in range(help_list[i][1]):
+                            print(buffer + help_list[i][1][k] + " " + help_list[i][2][k])
+
+
 
     def printGeneralHelp(self):
-        format = 10 + 8-4
-        print(buffer + "back", " "*(format-len("back")),  "Goes to previous song.")
-        print(buffer + "bugs", " " * (format - len("bugs")), "Appends following args to the bugs file.")
-        print(buffer + "empty", " "*(format-len("empty")), "Clears queue.")
-        print(buffer + "kill", " "*(format-len("kill")), "Quits the jukebox.")
-        print(buffer + "monthly", " " * (format - len("monthly")), "Returns short-term listening stats.")
-        print(buffer + "next", " "*(format-len("next")), "Skips to next song.")
-        print(buffer + "pause", " "*(format-len("pause")), "Pauses music.")
-        print(buffer + "play", " "*(format-len("play")), "Plays music, or resumes playing.")
-        print(buffer + "playlist", " "*(format-len("playlist")), "Command for editing playlists. Requires args.")
-        print(buffer + "prev", " "*(format-len("prev")), "See 'back'.")
-        print(buffer + "qadd", " " * (format - len("qadd")), "Quick adds a song to a playlist.")
-        print(buffer + "queue", " "*(format-len("queue")), "Command for queueing songs. Requires args.")
-        print(buffer + "quit", " "*(format-len("quit")), "See 'kill'.")
-        print(buffer + "rewind", " "*(format-len("rewind")), "Rewinds current song to its beginning.")
-        print(buffer + "search", " "*(format-len("search")), "Searches through songs library. Requires args.")
-        print(buffer + "shuffle", " "*(format-len("shuffle")), "Shuffles the current queue.")
-        print(buffer + "skip", " "*(format-len("skip")), "See 'next'.")
-        print(buffer + "stop", " "*(format-len("stop")), "See 'pause'.")
-        print(buffer + "to-add", " "*(format-len("to-add")), "Add following args to the to_add file.")
-        print(buffer + "version", " " * (format - len("version")), "Prints various versions and their changes.")
+        format = 5 + 14 #buffer + max.len
+        help_list = [("add", "Adds a song to a playlist. Playlist owner must be signed in."),
+                     ("back", "Goes to previous song."),
+                     ("complete", "Prints the number of songs with lyrics and genres in Library."),
+                     ("done", "Quits all submenus."),
+                     ("empty", "Clears queue."),
+                     ("genres", "Scours song metadata for genre information."),
+                     ("help", "Yields command information. Rather useless. <3"),
+                     ("kill", "Quits the jukebox."),
+                     ("loop", "Plays the following song n times. Requires args."),
+                     ("lyrics", "Prints lyrics of current song, if available."),
+                     ("monthly", "Returns short-term listening stats."),
+                     ("new-user", "requires args. switches to a new user."),
+                     ("next", "Skips to next song."),
+                     ("pause", "Pauses music."),
+                     ("play", "Plays music, or resumes playing."),
+                     ("playlist", "Command for editing playlists. Requires args."),
+                     ("prev", "Identical to 'back'."),
+                     ("qadd", "Quick adds a song to a playlist. Playlist owner must be signed in."),
+                     ("queue", "Command for queueing songs. Requires args."),
+                     ("quit", "Identical to 'kill'."),
+                     ("rewind", "Rewinds current song to its beginning."),
+                     ("search", "Searches through songs library. Requires args."),
+                     ("settings", "Opens the settings menu."),
+                     ("shuffle", "Shuffles the current queue."),
+                     ("skip", "Identical to 'next'."),
+                     ("songs", "Prints the full name of every song in the library."),
+                     ("stats", "Prints long-term analytics."),
+                     ("stop", "Identical to 'pause'."),
+                     ("text-to-lyrics", "Turns the contents of the songlyrics.txt file into song lyrics. requires args."),
+                     ("update-lyrics", "Scours the web for song lyrics in batches of 20.")]
+        dev_help_list = [("bugs", "Appends following args to the bugs file."),
+                         ("to-add", "Add following args to the to_add file."),
+                         ("version", "Prints various versions and their changes.")]
+        if self.terminal_length > len(buffer + format*" ") + 10:
+            for i in range(0, len(help_list)):
+                if len(buffer + help_list[i][0] + " "*(format-len(help_list[i][0])) + help_list[i][1]) < self.terminal_length:
+                    print(buffer + help_list[i][0] + " "*(format-len(help_list[i][0])) + help_list[i][1])
+                else:
+                    m = self.terminal_length - len(buffer + help_list[i][0] + " "*(format-len(help_list[i][0])))
+                    print_flush = buffer + help_list[i][0] + " "*(format-len(help_list[i][0]))
+                    split_help_list = help_list[i][1].split(" ")
+                    for j in range(0,len(split_help_list)):
+                        if len(print_flush + split_help_list[j]) < self.terminal_length:
+                            if j != 0:
+                                print_flush += " " + split_help_list[j]
+                            else:
+                                print_flush += split_help_list[j]
+                        else:
+                            print(print_flush)
+                            print_flush = buffer+format*" "+ split_help_list[j]
+                    if print_flush.replace(" ", "") != "":
+                        print(print_flush)
+
+        else:
+            print("Terminal size is too small to print nicely.")
+            for i in range(0, len(help_list)):
+                print(buffer + help_list[i][0] + " "*(format-len(help_list[i][0])) + help_list[i][1])
         print()
         print(buffer + "For more specific instructions and arg./kwarg details,")
         print(buffer + "type 'help COMMAND' for any given COMMAND.")
@@ -1258,7 +1417,7 @@ class JukeBox:
             f.close()
 
     def AnalyseItAll(self):
-        console_size = 80
+        console_size = self.terminal_length
         NUM = 10
         print("-" * console_size)
         top_ten = self.metric_maths("de", NUM, is_full=True)
@@ -1278,18 +1437,18 @@ class JukeBox:
 
 
     def MonthlyListeningStats(self, NUM, METRIC):
-        console_size = 80
+        console_size = self.terminal_length
         for i in range(0, 10):
             print()
         print(" "*(int(console_size/2)-int(len("*** KITCHEN ***")/2))+"*** KITCHEN ***")
-        print("="*(80))
+        print("="*(console_size))
         print("Server: "+self.user)
         print()
         print(" "*(int(console_size/2)-int(len("MUSIC TASTE TEST")/2))+"MUSIC TASTE TEST")
         print()
         print(datetime.datetime.now())
-        print("QTY. " + buffer +"NAME." + " "*(80-len(buffer)-14) + "AMT.")
-        print("=" * (80))
+        print("QTY. " + buffer +"NAME." + " "*(console_size-len(buffer)-14) + "AMT.")
+        print("=" * (console_size))
         if METRIC == "ln":
             print(2 * buffer + "-log time")
         print()
@@ -1420,10 +1579,10 @@ class JukeBox:
             for j in range(0, len(top_songs)):
                 if in_hms:
                     min_sec_print = datetime.timedelta(seconds=np.round(float(top_songs[j][1]),0))
-                    end_buff = 80-len(str(j+1)+"x" + 2*buffer + str(min_sec_print))
+                    end_buff = console_size-len(str(j+1)+"x" + 2*buffer + str(min_sec_print))
                 else:
                     min_sec_print = str(np.round(top_songs[j][1],3))
-                    end_buff = 80 - len(str(j + 1) + "x" + 2 * buffer + str(min_sec_print))
+                    end_buff = console_size - len(str(j + 1) + "x" + 2 * buffer + str(min_sec_print))
                 if len(top_songs[j][0].replace(".mp3","").replace(".opus","")) <= end_buff:
                     line_one = top_songs[j][0].replace(".mp3","").replace(".opus","")
                     line_two = ""
@@ -1574,6 +1733,11 @@ class JukeBox:
                    "for checking completness of library and randomness of shuffle ability. fixed parser to be more"
                    "like a bash style script. Added backup .json files to help shield against crashes and"
                    "other such errors without destroying ones library.", "")
+        self.pront("1.4.1: Fixed search -as. Updated queue, songs, play, playlists to take new song identifiers (filepaths)"
+                   "instead of the old ones (self.songnames index). Made settings changable via the program. "
+                   "Updated README.md. Fixed self.terminal_length (size setting) being set to 80 in various"
+                   "function definitions. Automated install - now all that needs to happen is to run the main.py file."
+                   "updated help function.", "")
 
     def updateBugs(self, str):
         with open("bugs.txt","a") as f:
@@ -1582,6 +1746,48 @@ class JukeBox:
     def updateToAdd(self, str):
         with open("To_Add.txt","a") as f:
             f.write(str+"\n")
+
+    def updateSettings(self):
+        settingslist = []
+        with open("Settings.txt", "r") as f:
+            for x in f:
+                settingslist.append(x)
+        print(settingslist)
+        print("Type 'done' to exit settings menu. Type 'quit' to exit program. Type 'users NEW, LIST, OF, USERS',"
+              "'directory /path/to/new/directory', or 'size NEW_TERMINAL_LENGTH' to update any of the current settings")
+        with open("Input.txt", "w") as f:
+            f.write("")
+        main = True
+        while main:
+            usr_list = ""
+            dir_path = ""
+            size = ""
+            #getting user input
+            with open("Input.txt", "r") as f:
+                for x in f:
+                    if x != "":
+                        if x == "done":
+                            main = False
+                        elif "users" in x[0:5]:
+                            x = x[5:]
+                            usr_list = x.split(",")
+                        elif "directory" in x[0:9]:
+                            dir_path = x[9:]
+                        elif "size" in x[0:4]:
+                            size = x[4:]
+            #actually updating the settings file
+            if usr_list != "" or dir_path != "" or size != "":
+                if usr_list != "":
+                    settingslist[0] = "users: " + usr_list + "\n"
+                elif dir_path != "":
+                    settingslist[1] = "directory: " + dir_path + "\n"
+                elif size != "":
+                    settingslist[2] = "size: " + size + "\n"
+                write_flush = ""
+                for i in range(0,len(settingslist)):
+                    write_flush += settingslist[i]
+                with open("Settings.txt", "w") as f:
+                    f.write(write_flush)
 
     def Lyrics(self, is_spoof_agents=False, none_lyrics=False):
         with open("Songs.json", "r") as f:
