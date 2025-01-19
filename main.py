@@ -117,23 +117,23 @@ try:
 except FileNotFoundError:
     with open("ShortTermAnalytics.txt", "w") as f:
         pass
-try:
+'''try:
     with open("Songs.txt", "r") as f:
         pass
 except FileNotFoundError:
     with open("Songs.txt", "w") as f:
-        pass
+        pass'''
 try:
     with open("Songs.json", "r") as f:
         pass
 except FileNotFoundError:
-    with open("Songs.json.txt", "w") as f:
+    with open("Songs.json", "w") as f:
         pass
 try:
-    with open("songlyrics.txt.txt", "r") as f:
+    with open("songlyrics.txt", "r") as f:
         pass
 except FileNotFoundError:
-    with open("songlyrics.txt.txt", "w") as f:
+    with open("songlyrics.txt", "w") as f:
         pass
 try:
     with open("songsbackup.json", "r") as f:
@@ -153,20 +153,23 @@ def printLogo():
     print(" |\"U'XXX'U\"|")
     print(" |\"U'XXX'U\"|" + " "*15 + "Designed by Claudia >:3")
     print(" |\"U''X''U\"|")
-    print(" |\"'U'\"'U'\"|" + " "*15 + "Version 1.4.1")
+    print(" |\"'U'\"'U'\"|" + " "*15 + "Version 1.4.2")
     print(" |\"''UUU''\"|")
     print(" ```````````")
 
 
 class JukeBox:
-    def __init__(self, user, songs):
+    def __init__(self, user):
         self.users = []
+        #add install location stuff
+        settingsNonempty = False
         with open("Settings.txt", "r") as f:
             for x in f:
                 x = x.replace("\n", "")
                 x = x.split(":")
                 if x[0] == "users":
                     if len(x) > 1:
+                        settingsNonempty = True
                         user_string_list = x[1].split(",")
                         for y in user_string_list:
                             while y[0] == " ":
@@ -174,23 +177,31 @@ class JukeBox:
                             while y[-1] == " ":
                                 y = y[:-1]
                             self.users.append(y)
-                    else:
-                        user_one = input("Please enter a user name.")
-                        self.users = ["admin", user_one]
                 elif x[0] == "directory":
                     if len(x) > 1:
+                        settingsNonempty = True
                         while x[1][0] == " ":
                             x = x[1][1:]
                         while x[1][-1] == " ":
                             x = x[1][:-1]
                         self.Directory = x
-                    else:
-                        self.Directory = input("Please enter the full path to the music directory.")
                 elif x[0] == "size":
                     if len(x) > 1:
+                        settingsNonempty = True
                         self.terminal_length = int(x[1])
-                    else:
-                        self.terminal_length = input("Please enter the length, by count of characters, of your terminal.")
+        if not settingsNonempty:
+            user_one = input("Please enter a user name.")
+            self.users = ["admin", user_one]
+            self.Directory = input("Please enter the full path to the music directory.")
+            self.terminal_length = input("Please enter the length, by count of characters, of your terminal.")
+            user_string_list = ""
+            for i in range(0,len(self.users)):
+                user_string_list += self.users[i] + ", "
+
+            with open("Settings.txt", "w") as f:
+                f.write("users: " + user_string_list + "\n" + "directory: " + self.Directory + "\n" + "size: " + self.terminal_length + "\n")
+
+
         if user.lower() in self.users:
             self.user = user.lower()
             print(buffer+f"Hello, {self.user.lower()}! I have some music for you!")
@@ -697,7 +708,7 @@ class JukeBox:
                     if usr_input.split("-ps ")[1] in self.playlistnames:
                         for x in self.playlistInhalts[self.playlistnames.index(usr_input.split("-ps ")[1])][0]:
                             if x in self.songs:
-                                self.queue.append(self.songs[x])
+                                self.queue.append(x)
                         random.shuffle(self.queue)
                         random.shuffle(self.queue)
                 elif "-a" in usr_input:
@@ -1738,6 +1749,8 @@ class JukeBox:
                    "Updated README.md. Fixed self.terminal_length (size setting) being set to 80 in various"
                    "function definitions. Automated install - now all that needs to happen is to run the main.py file."
                    "updated help function.", "")
+        self.pront("1.4.2: Fixed install errors (not creating songs.json file, settings.txt not being prompted)"
+                   "depreciated Songs.txt", "")
 
     def updateBugs(self, str):
         with open("bugs.txt","a") as f:
@@ -2105,7 +2118,7 @@ if __name__ == "__main__":
                     if x != "":
                         user = x
 
-        JukeBox(user, "Songs.txt").run()
+        JukeBox(user).run()
     else:
         print_flush = ""
         for x in missing_packages:
