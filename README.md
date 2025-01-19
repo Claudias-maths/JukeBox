@@ -1,6 +1,6 @@
 # JukeBox
 A Python-based Shell script-style audio player.<br>
-Note: The install process has not been rigorously tested. Likely much of it will fail at this point. Knowledge of python and programming is a requirement to both install and run this currently.
+Note: While the install process has been tested, it is likely unforeseen bugs will appear in this code. Having an understanding of python is recommended, although not required.
  
  ## Installation
 Ensure that all of the following python packages and their dependencies are installed, as well as python 3.9 (or later!). The package versions listed here are known to work; however, earlier versions of the packages may also be compatible.
@@ -26,11 +26,10 @@ Currently, this music player fully supports .mp3 and .opus files, and supports p
 * Artist - Album - Song name.mp3
 * Song name.mp3
 
-If the song title, album name, or artist name contains a dash (-), replace it with an underscore (_). If they contain a backslash (/), replace them with two underscores (__). If they contain a colon (:), replace them with three underscores (___). Song titles may not contain a \pm symbol (±).
+If the song title, album name, or artist name contains a dash (-), replace it with an underscore (\_). If they contain a backslash (/), replace them with two underscores (\_\_). If they contain a colon (:), replace them with three underscores (\_\_\_). Song titles may not contain a \pm symbol (±).
 	
 ## Running the program
 In a terminal shell, run "python3 \path\to\main.py & \path\to\userInput.py"
 
 ## Features
 This program is light on memory storage. It is very plurality-friendly, as switching between users/headmates can be done with one command 'new-user USERNAME'. Almost all of the program can be run without an internet connection, excepting the code for updating lyrics. This program runs has an analytics feature - with both a short term and a long term document saving user metrics. While these documents cannot yet be disabled, they are both stored on-site in the program files and can be deleted at the user's convenience, both inside and outside the program. This jukebox supports playlists, and has a basic playlist editing feature, and also has a robust queue function.
-
